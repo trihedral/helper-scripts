@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#powershell.exe C:\\ProgramData\\kyled\\atom\\atom.exe "\\\\wsl.localhost\\Ubuntu-20.04\\$PWD\test.ky" | tr '/' '\\'
+
+#winUsr=$(powershell.exe "\$env:username")
+winUsr=$(powershell.exe \$env:username | tr -cd '\11\12\40-\176') #tr -d '[:cntrl:]' | tr -d '\r')
+wslVer=$(powershell.exe wsl -l -q --running | tr -cd '\11\12\40-\176') #tr -d '[:cntrl:]' | tr -d '\r')
+winPth=$(echo \\\\wsl.localhost\\$wslVer$PWD | tr '/' '\\')
+atmPth=C:\\ProgramData\\$winUsr\\atom\\atom.exe
+
+#echo $winUsr
+#echo $wslVer
+#echo $winPth
+#echo $winUsr $wslVer $atmPth $winPth
+#winPth=$(echo \\\\wsl.localhost\\$wslVer$PWD\\$1 | tr '/' '\\')
+powershell.exe $atmPath $winPth\\$1

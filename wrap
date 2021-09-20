@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+import sys
+from sys import argv
+import re
+
+# wrap [flags] file line_length [block_to_fix]
+# -f mode to wrap even if block lines < line_length
+# -a mode to wrap all blocks - DEFAULT
+# -b mode to box blocks at line_length
+# -? mode to show block numbers
+
+def fixBlock(b, maxL, strict=False):
+    i = len(b.rstrip())
+    line = b[:i].replace('\n', ' ')
+    tail = b[i:]
+
+    if not strict:
+        lengths = []
+        for L in b[:i].split('\n'): lengths.append(len(L))
+        if max(lengths) < maxL: return b
+
+    n0 = 0; n = maxL
+    while n < len(line):
+        if line[n].isspace():
+            line = line[:n] + '\n' + line[n+1:]
+            n0 = n+1
+            n += maxL+1
+        else: n-= 1;
+        if n == n0: # couldn't find breakpoint
+            n  = n0 + 2*maxL
+            n0 = n0 + maxL
+    return line + tail
+
+
+MODE_A = True;
+MODE_F = False;
+MODE_Q = False;
+
+# Get flags and set modes #
+for i in range(1, len(argv)):
+    arg = argv[i]
+    if arg[0] == '-':
+        argv.pop(i)
+        for c in arg:
+            if c == 'f': MODE_F = True
+            if c == '?': MODE_Q = True
+            if c == 'q': MODE_Q = True
+if len(argv) > 3:  # block number given
+    MODE_A = False;
+
+fileName = argv[1]
+with open(fileName) as inFile:
+    text = inFile.read()
+
+blocks = []
+i0 = 0
+for match in re.finditer('\n\s*(\n|$)', text):
+    i,j = match.span()
+    blocks.append(text[i0:j])
+    i0 = j
+
+if MODE_Q:
+    for i in range(len(blocks)):
+        print('\n  '+ str(i+1) + '  ')
+        print( "="*(len(str(i+1))+4) )
+        print(blocks[i].strip())
+    print()
+    sys.exit()
+
+newBlocks = blocks
+maxL = int(argv[2])
+if MODE_A:
+    for i in range(len(blocks)):
+        newBlocks[i] = fixBlock(blocks[i], maxL, MODE_F)
+
+else:
+    sel = int(argv[3]) - 1
+    newBlocks[sel] = fixBlock(blocks[sel], maxL, MODE_F)
+
+out = ""
+for block in newBlocks:
+    out += block
+print(out)
