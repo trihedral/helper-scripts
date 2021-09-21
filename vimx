@@ -1,5 +1,15 @@
 #!/bin/bash
+
 touch $1
-chmod +x $1
+chmod +x $1           # Ifs not working
+if [[ $(echo $1 | grep '\.py$') != "" ]]; then
+  echo "PY!"
+  echo '#!usr/bin/env python3' >> $1
+elif [[ $(grep -o '\.ky$' $1) != "" ]]; then
+  echo '#!usr/bin/env kython' >> $1
+else
+  echo '#!/bin/bash' >> $1
+fi  
+
 vim $1
 
