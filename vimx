@@ -1,15 +1,24 @@
 #!/bin/bash
-
-touch $1
-chmod +x $1           # Ifs not working
-if [[ $(echo $1 | grep '\.py$') != "" ]]; then
-  echo "PY!"
-  echo '#!usr/bin/env python3' >> $1
-elif [[ $(grep -o '\.ky$' $1) != "" ]]; then
-  echo '#!usr/bin/env kython' >> $1
+  
+## if file doesn't exist ##
+if [ ! -e $1 ]; then
+  touch $1     # create it
+  chmod +x $1  # make it excecutable
+  
+  # add appropriate shebang #
+  if [[ "$(echo $1 | grep '\.py$')" != "" ]]; then    
+    echo '#!usr/bin/env python3' >> $1
+  elif [[ "$(echo $1 | grep '\.ky$')" != "" ]]; then 
+    echo '#!usr/bin/env kython' >> $1
+  else
+    echo '#!/bin/bash' >> $1
+  fi
+  echo '' >> $1  # append extra newline
+  vim +2 $1      # open to line 2 (cursor below #!)
+  
+  
+## if file already exists ##
 else
-  echo '#!/bin/bash' >> $1
-fi  
-
-vim $1
+  vim $1 # open normally
+fi
 
