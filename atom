@@ -14,7 +14,7 @@ winUsr=$(powershell.exe \$env:username | tr -dc '[:alnum:]-.')
 wslVer=$(powershell.exe wsl -l -q --running | tr -dc '[:alnum:]-.') 
 # covert current unix path to windows format
 winPth=$(echo \\\\wsl.localhost\\$wslVer$PWD\\$1 | tr '/' '\\')
-# NOTE: C:/.../atom/bin in $PATH doesn't contain atom.exe!! Just a chain of boken scripts that can't raach atom.exe
+# NOTE: C:/.../atom/bin found in $PATH below doesn't contain atom.exe!! Just a chain of boken scripts that can't raach atom.exe
 #atmPth=C:$(echo "$PATH" | grep -oP '(?<=/mnt/c)[^:]*atom[^:]*' | tr '/' '\\' | tr -dc '[:alnum:]\\_.')\\atom.exe 
 # instead build my Win11 atom using windows username - here's hoping it's universal!
 atmPth=C:\\ProgramData\\$winUsr\\atom\\atom.exe
