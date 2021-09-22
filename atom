@@ -1,26 +1,23 @@
 #!/bin/bash
 
-# 1 Can open path/to/file but NOT path/to (aka a dif) - some PS crap
-# 2 Can only handle relative paths (including ../path) but not ~/path or /path
+## BUILD WIN PATH TO ATOM.EXE ##
+winUsr=$(powershell.exe \$env:username | tr -dc '[:alnum:]-._') # get windows username from PS and remove dos invisibles
+atmPth=C:\\ProgramData\\$winUsr\\atom\\atom.exe # would prefer $PATH, but atom's entry does not directly lead to atom.exe
 
-# 2: if [[ $1[0] == "/" ]]  # check syntax
-#      
-#    if [[ $1[0] == "~" ]] 
-# 
+## FORMAT ARGS ##
+if [[ ${1:0:1} == "~" ]] || [[ ${1:0:1} == "/" ]]; then # full path or home relative - just send args
+  atmArg=$@
+elif [[ ${1:0:1} == "-" ]]; then # no file but flags - insert a space between 
+  atmArg=' '$@
+else                   # no file or relative path
+  atmArg=$PWD\\$@         # prepend pwd
+fi
 
-# get windows username from PS and remove dos invisibles
-winUsr=$(powershell.exe \$env:username | tr -dc '[:alnum:]-.')
-# get wsl distro name from PS and remove dos invisibles
-wslVer=$(powershell.exe wsl -l -q --running | tr -dc '[:alnum:]-.') 
-# covert current unix path to windows format
-winPth=$(echo \\\\wsl.localhost\\$wslVer$PWD\\$1 | tr '/' '\\')
-# NOTE: C:/.../atom/bin found in $PATH below doesn't contain atom.exe!! Just a chain of boken scripts that can't raach atom.exe
-#atmPth=C:$(echo "$PATH" | grep -oP '(?<=/mnt/c)[^:]*atom[^:]*' | tr '/' '\\' | tr -dc '[:alnum:]\\_.')\\atom.exe 
-# instead build my Win11 atom using windows username - here's hoping it's universal!
-atmPth=C:\\ProgramData\\$winUsr\\atom\\atom.exe
+## BUILD WIN PATH TO FILE IN WSL ##
+wslVer=$(powershell.exe wsl -l -q --running | tr -dc '[:alnum:]-._') # get wsl distro name from PS and remove dos invisibles
+winPth=$(echo \\\\wsl.localhost\\$wslVer$atmArg | tr '/' '\\')  # replace / with escaped \
 
-# excecute command with powershell and open windows program into linux directory, BAM!
+# excecute command with powershell and open windows atom.exe  into linux directory, BAM!
 echo powershell.exe "$atmPth" "$winPth"
 powershell.exe "$atmPth" "$winPth"
-#powershell.exe Invoke-Expression -Command "$atmPath $winPth"
 
