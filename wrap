@@ -5,13 +5,16 @@ import re
 
 # wrap [flags] file line_length [block_to_fix]
 # -f mode to wrap even if block lines < line_length
-# -a mode to wrap all blocks - DEFAULT
-# -b mode to box blocks at line_length
-# -? mode to show block numbers
+# -? -q mode to show block numbers
+
+# Future options(?):
+# -b mode to box blocks at line_length or other
+
 
 def fixBlock(b, maxL, strict=False):
     i = len(b.rstrip())
-    line = b[:i].replace('\n', ' ')
+    line = b[:i].replace(' \n', ' ')  # change to re.sub('\s+\n',...)
+    line = b[:i].replace('\n', '')
     tail = b[i:]
 
     if not strict:
@@ -31,20 +34,28 @@ def fixBlock(b, maxL, strict=False):
             n0 = n0 + maxL
     return line + tail
 
-
+nArg = len(argv)
+args = argv
 MODE_A = True;
 MODE_F = False;
 MODE_Q = False;
+# MODE_B = False;  # box output (can't re-wrap)
 
 # Get flags and set modes #
-for i in range(1, len(argv)):
+i = 1
+while (i < len(argv)):
     arg = argv[i]
     if arg[0] == '-':
-        argv.pop(i)
         for c in arg:
             if c == 'f': MODE_F = True
             if c == '?': MODE_Q = True
             if c == 'q': MODE_Q = True
+            # if c == 'q': MODE_B = True
+        argv.pop(i)
+    else: i+=1;
+
+
+
 if len(argv) > 3:  # block number given
     MODE_A = False;
 
@@ -72,7 +83,6 @@ maxL = int(argv[2])
 if MODE_A:
     for i in range(len(blocks)):
         newBlocks[i] = fixBlock(blocks[i], maxL, MODE_F)
-
 else:
     sel = int(argv[3]) - 1
     newBlocks[sel] = fixBlock(blocks[sel], maxL, MODE_F)
