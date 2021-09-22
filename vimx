@@ -16,7 +16,7 @@ if [ ! -e $1 ]; then
   echo '' >> $1  # append extra newline
   vim +2 $1      # open to line 2 (cursor below #!)
   
-  
+
 ## if file already exists ##
 else
   vim $1 # open normally
