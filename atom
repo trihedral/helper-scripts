@@ -19,5 +19,5 @@ winPth=$(echo \\\\wsl.localhost\\$wslVer$atmArg | tr '/' '\\')  # replace / with
 
 # excecute command with powershell and open windows atom.exe  into linux directory, BAM!
 echo powershell.exe "$atmPth" "$winPth"
-powershell.exe "$atmPth" "$winPth"
+powershell.exe "$atmPth" "$winPth" > /dev/null &
 
